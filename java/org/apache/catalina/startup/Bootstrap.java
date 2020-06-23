@@ -244,11 +244,13 @@ public final class Bootstrap {
 
 
     /**
+     * Bootstrap对象的初始化动作
      * Initialize daemon.
      * @throws Exception Fatal initialization error
      */
     public void init() throws Exception {
 
+        // 初始化相关类加载器
         initClassLoaders();
 
         Thread.currentThread().setContextClassLoader(catalinaLoader);
@@ -258,6 +260,7 @@ public final class Bootstrap {
         // Load our startup class and call its process() method
         if (log.isDebugEnabled())
             log.debug("Loading startup class");
+        // 把Catalina类加载上来，并且实例化了一个Catalina对象赋值给startupInstance
         Class<?> startupClass = catalinaLoader.loadClass("org.apache.catalina.startup.Catalina");
         Object startupInstance = startupClass.getConstructor().newInstance();
 
@@ -269,6 +272,9 @@ public final class Bootstrap {
         paramTypes[0] = Class.forName("java.lang.ClassLoader");
         Object paramValues[] = new Object[1];
         paramValues[0] = sharedLoader;
+
+
+        // 反射调用Catalina对象的一个方法（setParentClassLoader）
         Method method =
             startupInstance.getClass().getMethod(methodName, paramTypes);
         method.invoke(startupInstance, paramValues);
@@ -295,6 +301,8 @@ public final class Bootstrap {
             param = new Object[1];
             param[0] = arguments;
         }
+
+        // 通过反射调用 Catalina.load()方法
         Method method =
             catalinaDaemon.getClass().getMethod(methodName, paramTypes);
         if (log.isDebugEnabled()) {
@@ -338,7 +346,7 @@ public final class Bootstrap {
         if (catalinaDaemon == null) {
             init();
         }
-
+        // 调用Catalina的start方法
         Method method = catalinaDaemon.getClass().getMethod("start", (Class [])null);
         method.invoke(catalinaDaemon, (Object [])null);
     }
@@ -439,15 +447,18 @@ public final class Bootstrap {
 
         synchronized (daemonLock) {
             if (daemon == null) {
+                // 实例化一个当前Bootstrap引导类对象
                 // Don't set daemon until init() has completed
                 Bootstrap bootstrap = new Bootstrap();
                 try {
+                    // 执行当前类方法init做一些初始化动作
                     bootstrap.init();
                 } catch (Throwable t) {
                     handleThrowable(t);
                     t.printStackTrace();
                     return;
                 }
+                // 把当前Bootstrap引导类对象赋值给了一个变量daemon
                 daemon = bootstrap;
             } else {
                 // When running as a service the call to stop will be on a new
@@ -471,8 +482,12 @@ public final class Bootstrap {
                 args[args.length - 1] = "stop";
                 daemon.stop();
             } else if (command.equals("start")) {
+                // 启动tomcat时传入的是start命令参数，所以走此分支
                 daemon.setAwait(true);
+
+                // TODO 启动时候非常重要的一步 load  加载初始化
                 daemon.load(args);
+                // TODO 启动时候非常重要的一步 start 启动
                 daemon.start();
                 if (null == daemon.getServer()) {
                     System.exit(1);

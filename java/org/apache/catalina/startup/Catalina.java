@@ -526,6 +526,7 @@ public class Catalina {
 
 
     /**
+     * 初始化一个server实例
      * Start a new server instance.
      */
     public void load() {
@@ -542,6 +543,7 @@ public class Catalina {
         // Before digester - it may be needed
         initNaming();
 
+        // 创建Digester用于xml解析，用于解析server.xml配置文件
         // Create and execute our Digester
         Digester digester = createStartDigester();
 
@@ -550,6 +552,7 @@ public class Catalina {
         File file = null;
         try {
             try {
+                // 定位到配置文件server.xml
                 file = configFile();
                 inputStream = new FileInputStream(file);
                 inputSource = new InputSource(file.toURI().toURL().toString());
@@ -608,6 +611,7 @@ public class Catalina {
             try {
                 inputSource.setByteStream(inputStream);
                 digester.push(this);
+                // 调用digester对象真正的去解析xml
                 digester.parse(inputSource);
             } catch (SAXParseException spe) {
                 log.warn("Catalina.start using " + getConfigFile() + ": " +
@@ -653,6 +657,7 @@ public class Catalina {
 
 
     /*
+     * Tomcat load 加载
      * Load using arguments
      */
     public void load(String args[]) {
@@ -668,6 +673,7 @@ public class Catalina {
 
 
     /**
+     * 启动server实例，启动server到最后非常重要的一件事情就是accept，当然中间也做一些其他的事情（比如engine未完成的事项）
      * Start a new server instance.
      */
     public void start() {
@@ -685,6 +691,7 @@ public class Catalina {
 
         // Start the new server
         try {
+            // 启动server
             getServer().start();
         } catch (LifecycleException e) {
             log.fatal(sm.getString("catalina.serverStartFail"), e);

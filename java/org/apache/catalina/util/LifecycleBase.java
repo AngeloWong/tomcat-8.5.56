@@ -125,6 +125,10 @@ public abstract class LifecycleBase implements Lifecycle {
     }
 
 
+    /**
+     * 每个组件初始化都会来到该类该方法，因为这些组件都实现了Lifecycle生命周期接口
+     * @throws LifecycleException
+     */
     @Override
     public final synchronized void init() throws LifecycleException {
         if (!state.equals(LifecycleState.NEW)) {
@@ -133,6 +137,7 @@ public abstract class LifecycleBase implements Lifecycle {
 
         try {
             setStateInternal(LifecycleState.INITIALIZING, null, false);
+            // init的关键之处
             initInternal();
             setStateInternal(LifecycleState.INITIALIZED, null, false);
         } catch (Throwable t) {
@@ -420,6 +425,7 @@ public abstract class LifecycleBase implements Lifecycle {
         this.state = state;
         String lifecycleEvent = state.getLifecycleEvent();
         if (lifecycleEvent != null) {
+            // 触发start生命周期事件
             fireLifecycleEvent(lifecycleEvent, data);
         }
     }

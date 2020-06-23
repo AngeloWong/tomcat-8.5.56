@@ -716,6 +716,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 new PrivilegedAddChild(child);
             AccessController.doPrivileged(dp);
         } else {
+            // 进一步调用
             addChildInternal(child);
         }
     }
@@ -740,6 +741,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             if ((getState().isAvailable() ||
                     LifecycleState.STARTING_PREP.equals(getState())) &&
                     startChildren) {
+                // 具体处理某个Context进入
                 child.start();
             }
         } catch (LifecycleException e) {
@@ -881,7 +883,11 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     }
 
-
+    /**
+     * engine组件的初始化，就是创建了一个线程池startStopExecutor，这个线程池在engine组件的start阶段使用
+     * 好处：start阶段使用线程池并行实例化多个Host
+     * @throws LifecycleException
+     */
     @Override
     protected void initInternal() throws LifecycleException {
         BlockingQueue<Runnable> startStopQueue = new LinkedBlockingQueue<>();
@@ -918,6 +924,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         }
 
         // Start our child containers, if any
+        // 查找子容器，启动子容器,Host在初始化阶段后还是不完整的需要继续封装，把容器关系维护完整
         Container children[] = findChildren();
         List<Future<Void>> results = new ArrayList<>();
         for (Container child : children) {
@@ -948,7 +955,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             ((Lifecycle) pipeline).start();
         }
 
-
+        // 设置容器生命周期状态
         setState(LifecycleState.STARTING);
 
         // Start our thread
@@ -1409,6 +1416,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         @Override
         public Void call() throws LifecycleException {
+            // StartChild核心逻辑
             child.start();
             return null;
         }

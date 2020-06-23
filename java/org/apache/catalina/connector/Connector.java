@@ -1038,12 +1038,17 @@ public class Connector extends LifecycleMBeanBase  {
     }
 
 
+    /**
+     * Connector组件的初始化，Connector组件中有非常重要的两个组件protocolHandler和adapter
+     * @throws LifecycleException
+     */
     @Override
     protected void initInternal() throws LifecycleException {
 
         super.initInternal();
 
         // Initialize adapter
+        // 初始化adapter，并和protocolHandler关联起来
         adapter = new CoyoteAdapter(this);
         protocolHandler.setAdapter(adapter);
 
@@ -1072,6 +1077,7 @@ public class Connector extends LifecycleMBeanBase  {
         }
 
         try {
+            // protocolHandler组件的初始化，组要是其内部Endpoint的初始化
             protocolHandler.init();
         } catch (Exception e) {
             throw new LifecycleException(
