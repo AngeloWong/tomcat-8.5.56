@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.res;
 
+import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -166,6 +167,14 @@ public class StringManager {
         if (value == null) {
             value = key;
         }
+
+        // 控制台中文乱码问题 START
+        try {
+            value = new String(value.getBytes("ISO-8859-1"), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        // 控制台中文乱码问题 END
 
         MessageFormat mf = new MessageFormat(value);
         mf.setLocale(locale);
