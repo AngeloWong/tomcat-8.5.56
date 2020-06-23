@@ -428,6 +428,8 @@ public final class Bootstrap {
 
 
     /**
+     * Tomcat启动入口
+     *
      * Main method and entry point when starting Tomcat via the provided
      * scripts.
      *
