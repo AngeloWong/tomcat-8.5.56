@@ -4852,6 +4852,7 @@ public class StandardContext extends ContainerBase
     public boolean loadOnStartup(Container children[]) {
 
         // Collect "load on startup" servlets that need to be initialized
+        // wrapper只有servlet的相关信息，但是没有servlet的实例instance
         TreeMap<Integer, ArrayList<Wrapper>> map = new TreeMap<>();
         for (Container child : children) {
             Wrapper wrapper = (Wrapper) child;
@@ -4921,6 +4922,8 @@ public class StandardContext extends ContainerBase
         }
 
         // Post work directory
+
+        // 创建工作目录，tomcat下的work目录
         postWorkDirectory();
 
         // Add missing components as necessary
@@ -4940,6 +4943,7 @@ public class StandardContext extends ContainerBase
         }
 
         if (getLoader() == null) {
+            // web应用的类加载器WebappLoader，每一个Context都会有一个
             WebappLoader webappLoader = new WebappLoader();
             webappLoader.setDelegate(getDelegate());
             setLoader(webappLoader);
@@ -5050,6 +5054,8 @@ public class StandardContext extends ContainerBase
                 }
 
                 // Notify our interested LifecycleListeners
+
+                // 发出生命周期事件，调度了ContextConfig,读取web.xml，这里就是读取某一个项目的web.xml内容
                 fireLifecycleEvent(Lifecycle.CONFIGURE_START_EVENT, null);
 
                 // Start our child containers, if not already started
@@ -5185,6 +5191,7 @@ public class StandardContext extends ContainerBase
             }
 
             // Load and initialize all "load on startup" servlets
+            // 加载初始化servlet（配置了容器启动加载的，查看findChildren()列表项的instance值从null => 初始化完成）
             if (ok) {
                 if (!loadOnStartup(findChildren())){
                     log.error(sm.getString("standardContext.servletFail"));

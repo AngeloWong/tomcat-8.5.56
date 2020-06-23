@@ -902,6 +902,20 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
 
     /**
+     * Engine.start()做了些什么？
+     *      线程池提交线程，如果有多个Host,那么就可以多个线程一起并行实例化Host,加快tomcat启动速度
+     *      Host的实例化，是通过设置生命周期状态(start)，通过触发host的生命周期事件fireLifecycleEvent
+     *  来执行后续（后续需要实例化context）的工作（交给HostConfig进行，HostConfig是一个生命周期监听器，
+     *  监听到事件会触发响应的执行）
+     *      --> deployApps（处理Host下多个应用）
+     *      --> deployDirectories（处理Host下面以目录方式部署的app-context）
+     *      app处理的时候也是以多线程的方式并行进行
+     *          results.add(es.submit(new DeployDirectory(this,cn,dir)));
+     *
+     *      host.addChild(context)时才去触发context实例核心内容：比如wrapper-serlvet的一个封装
+     *
+     *      context具体读取web.xml封装wrapper过程使用事件驱动交给ContextConfig（它也是一个事件监听器）
+     *
      * Start this component and implement the requirements
      * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *

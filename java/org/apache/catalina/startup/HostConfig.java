@@ -1033,7 +1033,7 @@ public class HostConfig implements LifecycleListener {
 
                 if (isServiced(cn.getName()) || deploymentExists(cn.getName()))
                     continue;
-
+                // 把Context的创建和start以线程方式提交
                 results.add(es.submit(new DeployDirectory(this, cn, dir)));
             }
         }
@@ -1122,6 +1122,7 @@ public class HostConfig implements LifecycleListener {
             context.setPath(cn.getPath());
             context.setWebappVersion(cn.getVersion());
             context.setDocBase(cn.getBaseName());
+            // 此时context还是不完整的，需要进一步封装wrapper（servlet）
             host.addChild(context);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
@@ -1563,7 +1564,7 @@ public class HostConfig implements LifecycleListener {
             host.setDeployOnStartup(false);
             host.setAutoDeploy(false);
         }
-
+        // 部署webapp应用
         if (host.getDeployOnStartup())
             deployApps();
 

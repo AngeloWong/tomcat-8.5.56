@@ -982,9 +982,11 @@ public class StandardWrapper extends ContainerBase
      */
     @Override
     public synchronized void load() throws ServletException {
+        // 实例化servlet
         instance = loadServlet();
 
         if (!instanceInitialized) {
+            // 执行servlet的初始化方法
             initServlet(instance);
         }
 

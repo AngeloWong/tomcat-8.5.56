@@ -773,7 +773,7 @@ public class ContextConfig implements LifecycleListener {
                     Boolean.valueOf(context.getXmlValidation()),
                     Boolean.valueOf(context.getXmlNamespaceAware())));
         }
-
+        // 读取web项目配置（web.xml配置）
         webConfig();
 
         // 初始化jsp引擎
@@ -1106,15 +1106,17 @@ public class ContextConfig implements LifecycleListener {
          *   those in JARs excluded from an absolute ordering) need to be
          *   scanned to check if they match.
          */
+        // 生成web.xml的文件解析器
         WebXmlParser webXmlParser = new WebXmlParser(context.getXmlNamespaceAware(),
                 context.getXmlValidation(), context.getXmlBlockExternal());
 
         Set<WebXml> defaults = new HashSet<>();
         defaults.add(getDefaultWebXmlFragment(webXmlParser));
-
+        // web.xml解析结果放入WebXML对象
         WebXml webXml = createWebXml();
 
         // Parse context level web.xml
+        // web.xml文件输入流包装对象
         InputSource contextWebXml = getContextWebXmlSource();
         if (!webXmlParser.parseWebXml(contextWebXml, webXml, false)) {
             ok = false;

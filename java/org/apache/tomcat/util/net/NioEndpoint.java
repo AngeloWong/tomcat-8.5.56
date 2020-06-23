@@ -821,6 +821,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         @Override
         public void run() {
             // Loop until destroy() is called
+			// 轮询
             while (true) {
 
                 boolean hasEvents = false;
@@ -1611,6 +1612,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
             try {
                 int handshake = -1;
 
+                // 判断握手状态
                 try {
                     if (key != null) {
                         if (socket.isHandshakeComplete()) {

@@ -279,6 +279,7 @@ public final class Bootstrap {
             startupInstance.getClass().getMethod(methodName, paramTypes);
         method.invoke(startupInstance, paramValues);
 
+        // 把实例化出来的Catalina对象赋值给了catalinaDaemon
         catalinaDaemon = startupInstance;
     }
 
