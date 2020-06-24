@@ -1063,20 +1063,25 @@ public abstract class AbstractEndpoint<S> {
      *
      * @return if processing was triggered successfully
      */
+    //  Socket请求处理方法（此时请求由Poller线程传递给Worker线程处理）
     public boolean processSocket(SocketWrapperBase<S> socketWrapper,
             SocketEvent event, boolean dispatch) {
         try {
             if (socketWrapper == null) {
                 return false;
             }
+            // 从缓存池中获取一个SocketProcessor处理线程
             SocketProcessorBase<S> sc = processorCache.pop();
             if (sc == null) {
+                // 缓存池中没有就创建
                 sc = createSocketProcessor(socketWrapper, event);
             } else {
+                // 缓存中有就直接使用
                 sc.reset(socketWrapper, event);
             }
             Executor executor = getExecutor();
             if (dispatch && executor != null) {
+                // 使用线程池技术执行SocketProcessor处理线程
                 executor.execute(sc);
             } else {
                 sc.run();

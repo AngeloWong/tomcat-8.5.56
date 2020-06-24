@@ -296,17 +296,20 @@ public class CoyoteAdapter implements Adapter {
     }
 
 
+    // CoyoteAdapter需要将Request和Response进行进一步封装为HttpServletRequest和HttpServletResponse
     @Override
     public void service(org.apache.coyote.Request req, org.apache.coyote.Response res)
             throws Exception {
-
+        // 下面的Request和Response是HttpServletRequest和HttpServletResponse，先看一下是否为空，为空就需要转换原生啦
         Request request = (Request) req.getNote(ADAPTER_NOTES);
         Response response = (Response) res.getNote(ADAPTER_NOTES);
 
         if (request == null) {
             // Create objects
+            // 原生Request包装进去
             request = connector.createRequest();
             request.setCoyoteRequest(req);
+            // 原生Request包装进去
             response = connector.createResponse();
             response.setCoyoteResponse(res);
 
@@ -334,12 +337,14 @@ public class CoyoteAdapter implements Adapter {
         try {
             // Parse and set Catalina and configuration specific
             // request parameters
+            // TODO 在这个方法中会根据请求信息找到能够处理当前请求的HOST->CONTEXT->WRAPPER(SERVLET)
             postParseSuccess = postParseRequest(req, request, res, response);
             if (postParseSuccess) {
                 //check valves if we support async
                 request.setAsyncSupported(
                         connector.getService().getContainer().getPipeline().isAsyncSupported());
                 // Calling the container
+                // TODO 上面匹配出能够处理当前请求的容器之后，就开始一级一级深入，最后取出servlet执行				
                 connector.getService().getContainer().getPipeline().getFirst().invoke(
                         request, response);
             }
@@ -690,6 +695,7 @@ public class CoyoteAdapter implements Adapter {
 
         while (mapRequired) {
             // This will map the the latest version by default
+            // TODO 在这一步会根据请求的uri，匹配出能够处理当前请求的HOST->CONTEXT-WRAPPER-SERVLET			
             connector.getService().getMapper().map(serverName, decodedURI,
                     version, request.getMappingData());
 

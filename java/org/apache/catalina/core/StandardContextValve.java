@@ -48,6 +48,7 @@ final class StandardContextValve extends ValveBase {
 
 
     /**
+     * 在Context中选择合适的子容器Wrapper处理当前请求	
      * Select the appropriate child Wrapper to process this request,
      * based on the specified request URI.  If no matching Wrapper can
      * be found, return an appropriate HTTP error.
@@ -73,6 +74,7 @@ final class StandardContextValve extends ValveBase {
         }
 
         // Select the Wrapper to be used for this Request
+        // 拿出能够处理当前请求的Wrapper
         Wrapper wrapper = request.getWrapper();
         if (wrapper == null || wrapper.isUnavailable()) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -93,6 +95,7 @@ final class StandardContextValve extends ValveBase {
         if (request.isAsyncSupported()) {
             request.setAsyncSupported(wrapper.getPipeline().isAsyncSupported());
         }
+        // TODO 调用Wrapper容器处理请求
         wrapper.getPipeline().getFirst().invoke(request, response);
     }
 }

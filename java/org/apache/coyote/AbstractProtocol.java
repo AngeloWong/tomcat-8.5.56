@@ -712,19 +712,24 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         }
 
 
+        // Handler处理该请求
         @Override
         public SocketState process(SocketWrapperBase<S> wrapper, SocketEvent status) {
+            // 日志输出
             if (getLog().isDebugEnabled()) {
                 getLog().debug(sm.getString("abstractConnectionHandler.process",
                         wrapper.getSocket(), status));
             }
+            // wrapper为空，连接状态置为关闭
             if (wrapper == null) {
                 // Nothing to do. Socket has been closed.
                 return SocketState.CLOSED;
             }
 
+            // 取出NioChannel通道（理解为Socket）
             S socket = wrapper.getSocket();
 
+            // 先试图从connections集合中获取当前Socket对应的Processor
             Processor processor = connections.get(socket);
             if (getLog().isDebugEnabled()) {
                 getLog().debug(sm.getString("abstractConnectionHandler.connectionsGet",
@@ -793,12 +798,17 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         }
                     }
                 }
+
+                // 上面如果没有找到的话从recycledProcessors中获取，也就是已经处理过连接但是没有被销毁的Processor，避免频繁地创建和销毁对象
                 if (processor == null) {
                     processor = recycledProcessors.pop();
                     if (getLog().isDebugEnabled()) {
                         getLog().debug(sm.getString("abstractConnectionHandler.processorPop", processor));
                     }
                 }
+
+                // 还是为空的话，那就使用createProcessor创建,默认情况下应该是Http11Processor（因为我们默认是http1.1版本）
+                // 后面我们就需要调用Http11Processor对请求进行简单的内容解析之后，则调用Adapter(连接适配器)的方法，将请求转发给容器，由Servlet容器来处理用户请求
                 if (processor == null) {
                     processor = getProtocol().createProcessor();
                     register(processor);
@@ -815,6 +825,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
                 SocketState state = SocketState.CLOSED;
                 do {
+                    // 调用应用层处理器处理，比如Http11Processor进行请求内容的解析
                     state = processor.process(wrapper, status);
 
                     if (state == SocketState.UPGRADING) {

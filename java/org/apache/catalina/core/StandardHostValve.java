@@ -108,6 +108,7 @@ final class StandardHostValve extends ValveBase {
         throws IOException, ServletException {
 
         // Select the Context to be used for this Request
+        // TODO Host中要去进一步把处理当前请求的Context取出来
         Context context = request.getContext();
         if (context == null) {
             return;
@@ -134,6 +135,7 @@ final class StandardHostValve extends ValveBase {
             // already in error must have been routed here to check for
             // application defined error pages so DO NOT forward them to the the
             // application for processing.
+            // TODO 把请求传递给Context处理			
             try {
                 if (!response.isErrorReportRequired()) {
                     context.getPipeline().getFirst().invoke(request, response);

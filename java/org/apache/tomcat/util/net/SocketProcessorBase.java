@@ -35,6 +35,9 @@ public abstract class SocketProcessorBase<S> implements Runnable {
     }
 
 
+    /**
+     * SocketProcessor 处理线程的核心run方法
+     */
     @Override
     public final void run() {
         synchronized (socketWrapper) {
@@ -46,10 +49,11 @@ public abstract class SocketProcessorBase<S> implements Runnable {
             if (socketWrapper.isClosed()) {
                 return;
             }
+            // 调用了doRun方法
             doRun();
         }
     }
 
-
+    // doRun方法是一个抽象方法由子类重写，子类即为SocketProcessor
     protected abstract void doRun();
 }

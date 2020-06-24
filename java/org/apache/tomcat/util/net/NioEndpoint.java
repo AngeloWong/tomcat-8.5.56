@@ -841,6 +841,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         }
                         wakeupCounter.set(0);
                     }
+                    // 销毁资源
                     if (close) {
                         events();
                         timeout(0, false);

@@ -110,6 +110,7 @@ public class MapperListener extends LifecycleMBeanBase
             Host host = (Host) conHost;
             if (!LifecycleState.NEW.equals(host.getState())) {
                 // Registering the host will register the context and wrappers
+                // 注册Host=>Context=>Wrapper, 完成Mapper对象的注册
                 registerHost(host);
             }
         }

@@ -37,6 +37,7 @@ public abstract class AbstractProcessorLight implements Processor {
     private Set<DispatchType> dispatches = new CopyOnWriteArraySet<>();
 
 
+    // 应用程序处理器Processor处理逻辑（初步解析处理请求）
     @Override
     public SocketState process(SocketWrapperBase<?> socketWrapper, SocketEvent status)
             throws IOException {
@@ -62,6 +63,7 @@ public abstract class AbstractProcessorLight implements Processor {
                 // Extra write event likely after async, ignore
                 state = SocketState.LONG;
             } else if (status == SocketEvent.OPEN_READ) {
+                // READ读状态处理
                 state = service(socketWrapper);
             } else if (status == SocketEvent.CONNECT_FAIL) {
                 logAccess(socketWrapper);

@@ -695,6 +695,7 @@ public final class Mapper {
         }
         host.toChars();
         uri.toChars();
+        // 具体匹配在这里
         internalMap(host.getCharChunk(), uri.getCharChunk(), version,
                 mappingData);
     }

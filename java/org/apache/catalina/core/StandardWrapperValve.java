@@ -82,6 +82,7 @@ final class StandardWrapperValve
     /**
      * Invoke the servlet we are managing, respecting the rules regarding
      * servlet lifecycle and SingleThreadModel support.
+     * 触发当前Wrapper中的servlet执行
      *
      * @param request Request to be processed
      * @param response Response to be produced
@@ -100,6 +101,7 @@ final class StandardWrapperValve
         long t1=System.currentTimeMillis();
         requestCount.incrementAndGet();
         StandardWrapper wrapper = (StandardWrapper) getContainer();
+        // 初始化一个Servlet变量
         Servlet servlet = null;
         Context context = (Context) wrapper.getParent();
 
@@ -131,6 +133,7 @@ final class StandardWrapperValve
         // Allocate a servlet instance to process this request
         try {
             if (!unavailable) {
+                // 把能够处理当前请求的Servlet实例从Wrapper容器中取出来
                 servlet = wrapper.allocate();
             }
         } catch (UnavailableException e) {
@@ -169,6 +172,7 @@ final class StandardWrapperValve
         request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
                 requestPathMB);
         // Create the filter chain for this request
+        // TODO 为当前请求的处理生成一个过滤器链（在这个链路中核心逻辑要触发Servlet的调用）
         ApplicationFilterChain filterChain =
                 ApplicationFilterFactory.createFilterChain(request, wrapper, servlet);
 
@@ -183,6 +187,7 @@ final class StandardWrapperValve
                         if (request.isAsyncDispatching()) {
                             request.getAsyncContextInternal().doInternalDispatch();
                         } else {
+                            // TODO 过滤器链执行
                             filterChain.doFilter(request.getRequest(),
                                     response.getResponse());
                         }
@@ -196,6 +201,7 @@ final class StandardWrapperValve
                     if (request.isAsyncDispatching()) {
                         request.getAsyncContextInternal().doInternalDispatch();
                     } else {
+                        // TODO 过滤器链执行
                         filterChain.doFilter
                             (request.getRequest(), response.getResponse());
                     }

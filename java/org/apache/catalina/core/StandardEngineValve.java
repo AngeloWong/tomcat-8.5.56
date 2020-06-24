@@ -59,6 +59,7 @@ final class StandardEngineValve extends ValveBase {
      * Select the appropriate child Host to process this request,
      * based on the requested server name.  If no matching Host can
      * be found, return an appropriate HTTP error.
+     * !!!当前是处于StandardEngind引擎中，从引擎中选择出合适的子Host来处理请求
      *
      * @param request Request to be processed
      * @param response Response to be produced
@@ -71,6 +72,7 @@ final class StandardEngineValve extends ValveBase {
         throws IOException, ServletException {
 
         // Select the Host to be used for this Request
+        // request.getHost就是从刚才封装好的mappingData中取出Host
         Host host = request.getHost();
         if (host == null) {
             response.sendError
@@ -84,6 +86,7 @@ final class StandardEngineValve extends ValveBase {
         }
 
         // Ask this Host to process this request
+        // 请求传入匹配到的Host,让其去处理
         host.getPipeline().getFirst().invoke(request, response);
 
     }
